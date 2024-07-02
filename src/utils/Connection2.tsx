@@ -1,16 +1,10 @@
-import { useAccount, useBalance } from 'wagmi';
+import { useAccount } from 'wagmi';
 import { ConnectKitButton } from "connectkit";
-
-import { formatUnits } from 'viem';
-
 
 
 const ConnectionDot2 = () => {
 
-  const { isConnected, address } = useAccount();
-  const { data: balanceData } = useBalance({ address });
-
-  const formattedBalance = balanceData ? Number(formatUnits(balanceData.value, balanceData.decimals)).toFixed(2) : '0.00';
+  const { isConnected } = useAccount();
 
   return (
     <div className="flex items-center">

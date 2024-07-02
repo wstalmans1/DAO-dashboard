@@ -9,9 +9,9 @@ const StyledButton = styled.button`
   display: inline-block;
   padding: 4px 16px;
   color: #ffffff;
-  background: #1a88f8;
-  font-size: 14px;
-  font-weight: 200;
+  background: #1a83f5;
+  font-size: 15px;
+  font-weight: 400;
   border-radius: 10rem;
   box-shadow: 0 4px 4px -6px #1a88f8;
 
