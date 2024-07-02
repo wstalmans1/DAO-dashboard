@@ -9,6 +9,22 @@ import PayWithMetamask from "./components/PayWithMetamask";
 import PayWithSigner from "./components/PayWithSigner";
 import './styles/main.css';
 
+import { WagmiProvider, createConfig } from "wagmi";
+import { mainnet, sepolia } from "wagmi/chains";
+import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
+import { ConnectKitProvider, getDefaultConfig } from "connectkit";
+
+const config = createConfig(
+  getDefaultConfig({
+    // Your dApps chains
+    chains: [mainnet, sepolia],
+    walletConnectProjectId: 'default_project_id',
+    appName: "TBA DAO",
+  }),
+);
+
+const queryClient = new QueryClient();
+
 
 const router = createHashRouter([ 
   { path: "/", element: <HomePage />, errorElement: <NotFoundPage />},
@@ -21,6 +37,12 @@ const router = createHashRouter([
 
 ReactDOM.createRoot(document.getElementById('root')!).render(
   <React.StrictMode>
-        <RouterProvider router={router} />
-  </React.StrictMode>,
-)
+    <WagmiProvider config={config}>
+      <QueryClientProvider client={queryClient}>
+        <ConnectKitProvider mode="light">
+          <RouterProvider router={router} />
+        </ConnectKitProvider>
+      </QueryClientProvider>
+    </WagmiProvider>
+  </React.StrictMode>
+);

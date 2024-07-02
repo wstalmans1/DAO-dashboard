@@ -1,7 +1,8 @@
 import '../styles/main.css';
 import { UserGroupIcon, HomeIcon, DocumentDuplicateIcon } from '@heroicons/react/24/outline';
 import { NavLink, Outlet } from "react-router-dom";
-//import ConnectionDot from '../utils/ConnectionDot';
+import { ExampleButton } from '../utils/Examplebutton';
+import ConnectionDot from '../utils/ConnectionDot';
 
 export default function Dashboard() {
 
@@ -70,7 +71,9 @@ export default function Dashboard() {
           
           <div className="flex items-center pt-1 pb-2">
             {/*<div className="pr-4"><ConnectionDot/></div>*/}
-            <div></div>
+            <div className="flex items-center">
+            <ConnectionDot/>
+            </div>
           </div>
           <div className="flex-grow bg-white bg-opacity-20 w-full h-full rounded-lg mt-1">
             <Outlet/>
