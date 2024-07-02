@@ -10,14 +10,14 @@ import PayWithSigner from "./components/PayWithSigner";
 import './styles/main.css';
 
 import { WagmiProvider, createConfig } from "wagmi";
-import { mainnet, sepolia } from "wagmi/chains";
+import { sepolia, mainnet } from "wagmi/chains";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { ConnectKitProvider, getDefaultConfig } from "connectkit";
 
 const config = createConfig(
   getDefaultConfig({
     // Your dApps chains
-    chains: [mainnet, sepolia],
+    chains: [sepolia, mainnet],
     walletConnectProjectId: 'default_project_id',
     appName: "TBA DAO",
   }),
