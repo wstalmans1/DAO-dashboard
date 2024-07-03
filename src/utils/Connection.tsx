@@ -37,7 +37,6 @@ const ConnectionDot = () => {
     <div className="flex items-center">
       <ConnectKitButton.Custom>
         {({ show, truncatedAddress, ensName, chain }) => (
-          <>
             <div onClick={show} className="cursor-pointer flex items-center">
               <div className={`h-3 w-3 rounded-full ${isConnected ? 'bg-green-500' : 'bg-red-500'}`}></div>
               <span className="ml-2 mr-3 text-l">{isConnected ? `Connected` : 'Not Connected'}</span>
@@ -53,7 +52,6 @@ const ConnectionDot = () => {
               )}
               </StyledButton>
             </div>
-          </>
         )}
       </ConnectKitButton.Custom>
     </div>
@@ -61,3 +59,26 @@ const ConnectionDot = () => {
 };
 
 export default ConnectionDot;
+
+
+
+// Alternative implementation using the standard ConnectKit Button directly
+
+{/* import { useAccount } from 'wagmi';
+import { ConnectKitButton } from "connectkit";
+
+
+const ConnectionDot2 = () => {
+
+  const { isConnected } = useAccount();
+
+  return (
+    <div className="flex items-center">
+              <div className={`h-3 w-3 rounded-full ${isConnected ? 'bg-green-500' : 'bg-red-500'}`}></div>
+              <span className="ml-2 mr-3">{isConnected ? `Connected` : 'Not Connected'}</span>
+              <ConnectKitButton showBalance theme='soft'/>
+    </div>
+  );
+};
+
+export default ConnectionDot2; */}

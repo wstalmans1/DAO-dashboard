@@ -78,7 +78,7 @@ export default function Dashboard() {
               {/*<ConnectionDot2 />*/}
             </div>
           </div>
-          <div className="flex-grow bg-white bg-opacity-20 w-full h-full rounded-lg mt-1">
+          <div className="flex-grow bg-white bg-opacity-20 w-full h-full rounded-lg mt-1 overflow-y-auto">
             <Outlet/>
           </div>
         </main>  
