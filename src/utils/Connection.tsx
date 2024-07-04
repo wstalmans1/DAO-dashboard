@@ -6,15 +6,18 @@ import { formatUnits } from 'viem';
 const StyledButton = styled.button`
   cursor: pointer;
   position: relative;
-  display: inline-block;
-  padding: 4px 16px;
+  display: inline-flex; // Ensures children are aligned
+  align-items: center; // Vertically aligns children
+  padding-left: 1rem;
+  padding-right: 1rem;
+  height: 2rem; // Ensure this is the desired height
+  min-height: 2rem; // Ensures the button has at least this height
   color: #ffffff;
-  background: #1a83f5;
+  background: #1a83f5; // Dark blue background
   font-size: 15px;
   font-weight: 400;
   border-radius: 10rem;
   box-shadow: 0 4px 4px -6px #1a88f8;
-
   transition: 200ms ease;
   &:hover {
     transform: translateY(-6px);
@@ -29,7 +32,9 @@ const StyledButton = styled.button`
 const ConnectionDot = () => {
 
   const { isConnected, address } = useAccount();
-  const { data: balanceData } = useBalance({ address });
+  const { data: balanceData } = useBalance({ address});
+
+
 
   const formattedBalance = balanceData ? Number(formatUnits(balanceData.value, balanceData.decimals)).toFixed(2) : '0.00';
 
@@ -44,8 +49,7 @@ const ConnectionDot = () => {
                 {isConnected ?(
                 <>
                   {ensName ?? truncatedAddress}
-                  <span className="bg-blue-800 text-center rounded-md p-1 ml-2 mr-1"> {formattedBalance} {balanceData?.symbol}</span>
-                  <span className="bg-blue-800 text-center rounded-md p-1 pr-3 ml-1 mr-1"> {chain?.name}</span>
+                  <span className="inline-flex items-center justify-center bg-blue-700 text-center rounded-xl p-3 ml-3" style={{ height: '1.97rem' }}> {formattedBalance} {balanceData?.symbol} { "on" } {chain?.name}</span>
                 </>
               ) : (
                 "Connect Wallet"
