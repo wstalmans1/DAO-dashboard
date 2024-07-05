@@ -48,7 +48,7 @@ const ConnectionDot = () => {
               <StyledButton>
                 {isConnected ?(
                 <>
-                  {ensName ?? truncatedAddress}
+                   {ensName ? `${ensName} (${truncatedAddress})` : truncatedAddress}
                   <span className="inline-flex items-center justify-center bg-blue-700 text-center rounded-xl p-3 ml-3" style={{ height: '1.97rem' }}> {formattedBalance} {balanceData?.symbol} { "on" } {chain?.name}</span>
                 </>
               ) : (
@@ -63,26 +63,3 @@ const ConnectionDot = () => {
 };
 
 export default ConnectionDot;
-
-
-
-// Alternative implementation using the standard ConnectKit Button directly
-
-{/* import { useAccount } from 'wagmi';
-import { ConnectKitButton } from "connectkit";
-
-
-const ConnectionDot2 = () => {
-
-  const { isConnected } = useAccount();
-
-  return (
-    <div className="flex items-center">
-              <div className={`h-3 w-3 rounded-full ${isConnected ? 'bg-green-500' : 'bg-red-500'}`}></div>
-              <span className="ml-2 mr-3">{isConnected ? `Connected` : 'Not Connected'}</span>
-              <ConnectKitButton showBalance theme='soft'/>
-    </div>
-  );
-};
-
-export default ConnectionDot2; */}

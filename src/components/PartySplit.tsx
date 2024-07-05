@@ -1,127 +1,149 @@
-import React, { useState, useEffect } from 'react';
-import { useAccount, useReadContract, useWriteContract, useWaitForTransactionReceipt, useSimulateContract } from 'wagmi';
-import { formatUnits } from 'viem';
+import React, { useState } from 'react';
+import { useAccount, useBalance, useBlockNumber, useReadContracts, useWriteContract, useWaitForTransactionReceipt } from 'wagmi';
+import { formatUnits, parseEther } from 'viem';
+import { BaseError } from 'viem';
+import { ConnectKitButton } from "connectkit";
 
 const contractAddress = '0xd34CF2A413c29B058Fd2634d170180cEF38A92Ec';
-const contractABI = [{"inputs":[{"internalType":"uint256","name":"_cost","type":"uint256"}],"stateMutability":"nonpayable","type":"constructor"},{"inputs":[],"name":"cost","outputs":[{"internalType":"uint256","name":"","type":"uint256"}],"stateMutability":"view","type":"function"},{"inputs":[{"internalType":"uint256","name":"","type":"uint256"}],"name":"members","outputs":[{"internalType":"address","name":"","type":"address"}],"stateMutability":"view","type":"function"},{"inputs":[{"internalType":"address payable","name":"_venue","type":"address"},{"internalType":"uint256","name":"_billAmount","type":"uint256"}],"name":"payBill","outputs":[],"stateMutability":"nonpayable","type":"function"},{"inputs":[{"internalType":"address","name":"","type":"address"}],"name":"payments","outputs":[{"internalType":"bool","name":"","type":"bool"}],"stateMutability":"view","type":"function"},{"inputs":[],"name":"rsvp","outputs":[],"stateMutability":"payable","type":"function"},{"inputs":[],"name":"totalDeposits","outputs":[{"internalType":"uint256","name":"","type":"uint256"}],"stateMutability":"view","type":"function"}];
+const contractABI = [
+  {"inputs":[],"name":"cost","outputs":[{"internalType":"uint256","name":"","type":"uint256"}],"stateMutability":"view","type":"function"},
+  {"inputs":[],"name":"totalDeposits","outputs":[{"internalType":"uint256","name":"","type":"uint256"}],"stateMutability":"view","type":"function"},
+  {"inputs":[],"name":"rsvp","outputs":[],"stateMutability":"payable","type":"function"}
+];
 
-const PartySplit: React.FC = () => {
-  const { isConnected } = useAccount();
+export function PartySplit() {
+  const { isConnected, address } = useAccount();
+  const { data: balanceData, isLoading: isBalanceLoading, refetch: refetchBalance } = useBalance({ address });
+  const { data: blockNumber } = useBlockNumber({ watch: true });
+  const [rsvpError, setRsvpError] = useState<string | null>(null);
 
-  const [cost, setCost] = useState<number>(0);
-  const [totalDeposits, setTotalDeposits] = useState<string>('0');
-
-  // Read contract state
-  const { data: costData } = useReadContract({
-    address: contractAddress,
-    abi: contractABI,
-    functionName: 'cost',
-  }) as { data: bigint | undefined };
-
-  const { data: totalDepositsData } = useReadContract({
-    address: contractAddress,
-    abi: contractABI,
-    functionName: 'totalDeposits',
-  }) as { data: bigint | undefined };
-
-  // Prepare and write to contract
-  const { data: simulationResult, error: simulationError } = useSimulateContract({
-    address: contractAddress,
-    abi: contractABI,
-    functionName: 'rsvp',
-    args: [],
-    value: costData,
+  const { 
+    data: contractData,
+    error: contractError,
+    isPending: isContractDataPending,
+    refetch: refetchContractData
+  } = useReadContracts({
+    contracts: [
+      {
+        address: contractAddress,
+        abi: contractABI,
+        functionName: 'cost',
+      },
+      {
+        address: contractAddress,
+        abi: contractABI,
+        functionName: 'totalDeposits',
+      }
+    ],
   });
 
-  useEffect(() => {
-    if (simulationError) {
-      console.error('Simulation error:', simulationError);
-    }
-    if (simulationResult) {
-      console.log('Simulation result:', simulationResult);
-    }
-  }, [simulationResult, simulationError]);
+  const { 
+    data: hash, 
+    error: writeError,
+    isPending: isWritePending,
+    writeContract
+  } = useWriteContract();
 
-  const { writeContract, data: rsvpHash, status } = useWriteContract();
+  const { 
+    isLoading: isConfirming, 
+    isSuccess: isConfirmed 
+  } = useWaitForTransactionReceipt({ hash });
 
-  const isRsvpLoading = status === 'pending';
+  const formattedBalance = balanceData 
+    ? Number(formatUnits(balanceData.value, balanceData.decimals)).toFixed(4) 
+    : '0.0000';
 
-  useEffect(() => {
-    if (costData !== undefined) {
-      setCost(Number(formatUnits(costData, 18)));
-    }
-    if (totalDepositsData !== undefined) {
-      setTotalDeposits(formatUnits(totalDepositsData, 18));
-    }
-  }, [costData, totalDepositsData]);
+  const cost = contractData?.[0]?.result ? Number(formatUnits(contractData[0].result as bigint, 18)).toFixed(4) : '0.0000';
+  const totalDeposits = contractData?.[1]?.result ? Number(formatUnits(contractData[1].result as bigint, 18)).toFixed(4) : '0.0000';
 
-  useEffect(() => {
-    if (costData !== undefined) {
-      console.log('Cost data:', costData);
-      setCost(Number(formatUnits(costData, 18)));
-    } else {
-      console.log('Cost data is undefined');
+  React.useEffect(() => {
+    if (blockNumber) {
+      refetchContractData();
+      refetchBalance();
     }
-  }, [costData]);
+  }, [blockNumber, refetchContractData, refetchBalance]);
 
-
-  const handleRSVP = async () => {
-    console.log('RSVP button clicked');
-    if (!isConnected) {
-      console.log('Wallet not connected');
-      return;
-    }
-    console.log('Wallet connected, proceeding with RSVP');
-    if (simulationError) {
-      console.error('Simulation error:', simulationError);
-      return;
-    }
-    if (!simulationResult) {
-      console.error('No simulation result');
-      return;
-    }
-    if (costData === undefined) {
-      console.error('Cost data is not available');
-      return;
-    }
-    try {
-      console.log('Attempting to write contract');
-      console.log('Simulation result request:', simulationResult.request);
-      const hash = await writeContract(simulationResult.request);
-      console.log('Transaction sent:', hash);
-    } catch (error) {
-      console.error('Error during RSVP:', error);
-      if (error instanceof Error) {
-        console.error('Error message:', error.message);
-      }
-      console.dir(error);
-    }
+  const handleRefresh = () => {
+    refetchContractData();
+    refetchBalance();
   };
 
-    // Wait for the transaction to complete
-    const { isLoading: isWaitingForTransaction } = useWaitForTransactionReceipt({
-      hash: rsvpHash,
+  const handleRSVP = async (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+    setRsvpError(null);
+    writeContract({
+      address: contractAddress,
+      abi: contractABI,
+      functionName: 'rsvp',
+      value: parseEther(cost),
     });
+  };
+
+  React.useEffect(() => {
+    if (isConfirmed) {
+      refetchContractData();
+      refetchBalance();
+    }
+  }, [isConfirmed, refetchContractData, refetchBalance]);
+
+  if (isContractDataPending) return <div>Loading contract data...</div>;
+
+  if (contractError) {
+    return <div>Error: {(contractError as BaseError).shortMessage || contractError.message}</div>;
+  }
 
   return (
-    <div className="flex flex-col justify-center items-center w-full min-h-screen">
-      <div className="text-center">
-        <h1>Split the Party</h1>
-      </div>
-      <div className="flex flex-col items-center justify-center">
-        <p>This is the content for PartySplit.</p>
-        <p>Cost: {cost} ETH</p>
-        <p>Total Deposits: {totalDeposits} ETH</p>
-        <button
-          onClick={handleRSVP}
-          disabled={isRsvpLoading || isWaitingForTransaction}
-          className="bg-green-600 text-white py-2 px-4 rounded"
-        >
-          {isRsvpLoading || isWaitingForTransaction ? 'Processing...' : 'RSVP'}
-        </button>
-      </div>
+    <div className="flex grow w-full h-full flex-col p-4">
+      <h1 className="text-2xl font-bold mb-4">Party Split</h1>
+      <ConnectKitButton.Custom>
+        {({ show, ensName }) => (
+          <div onClick={show} className="cursor-pointer mb-4">
+            {isConnected ? (
+              <p>Connected Address: {ensName ? `${ensName} (${address})` : address}</p>
+            ) : (
+              <button className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded">
+                Connect Wallet
+              </button>
+            )}
+          </div>
+        )}
+      </ConnectKitButton.Custom>
+      {isConnected ? (
+        <div>
+          {isBalanceLoading ? (
+            <p>Loading balance...</p>
+          ) : (
+            <p>Your Balance: {formattedBalance} {balanceData?.symbol}</p>
+          )}
+          <p>Event Cost: {cost} ETH</p>
+          <p>Total Deposits: {totalDeposits} ETH</p>
+          <button 
+            onClick={handleRefresh} 
+            className="mt-4 bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded"
+          >
+            Refresh Data
+          </button>
+          <form onSubmit={handleRSVP}>
+            <button 
+              type="submit"
+              disabled={isWritePending || isConfirming}
+              className="mt-4 ml-4 bg-green-500 hover:bg-green-700 text-white font-bold py-2 px-4 rounded disabled:bg-gray-400"
+            >
+              {isWritePending ? 'Confirming...' : isConfirming ? 'Processing...' : 'RSVP'}
+            </button>
+          </form>
+          {hash && <div>Transaction Hash: {hash}</div>}
+          {isConfirming && <div>Waiting for confirmation...</div>}
+          {isConfirmed && <div>Transaction confirmed.</div>}
+          {(writeError || rsvpError) && (
+            <div>Error: {(writeError as BaseError)?.shortMessage || writeError?.message || rsvpError}</div>
+          )}
+        </div>
+      ) : (
+        <p>Please connect your wallet to view event details and RSVP.</p>
+      )}
     </div>
   );
-};
+}
 
 export default PartySplit;
