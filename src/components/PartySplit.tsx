@@ -5,17 +5,16 @@ import { BaseError } from 'viem';
 import { ConnectKitButton } from "connectkit";
 
 const contractAddress = '0xd34CF2A413c29B058Fd2634d170180cEF38A92Ec';
-const contractABI = [
-  {"inputs":[],"name":"cost","outputs":[{"internalType":"uint256","name":"","type":"uint256"}],"stateMutability":"view","type":"function"},
-  {"inputs":[],"name":"totalDeposits","outputs":[{"internalType":"uint256","name":"","type":"uint256"}],"stateMutability":"view","type":"function"},
-  {"inputs":[],"name":"rsvp","outputs":[],"stateMutability":"payable","type":"function"}
-];
+const contractABI = [{"inputs":[{"internalType":"uint256","name":"_cost","type":"uint256"}],"stateMutability":"nonpayable","type":"constructor"},{"inputs":[],"name":"cost","outputs":[{"internalType":"uint256","name":"","type":"uint256"}],"stateMutability":"view","type":"function"},{"inputs":[{"internalType":"uint256","name":"","type":"uint256"}],"name":"members","outputs":[{"internalType":"address","name":"","type":"address"}],"stateMutability":"view","type":"function"},{"inputs":[{"internalType":"address payable","name":"_venue","type":"address"},{"internalType":"uint256","name":"_billAmount","type":"uint256"}],"name":"payBill","outputs":[],"stateMutability":"nonpayable","type":"function"},{"inputs":[{"internalType":"address","name":"","type":"address"}],"name":"payments","outputs":[{"internalType":"bool","name":"","type":"bool"}],"stateMutability":"view","type":"function"},{"inputs":[],"name":"rsvp","outputs":[],"stateMutability":"payable","type":"function"},{"inputs":[],"name":"totalDeposits","outputs":[{"internalType":"uint256","name":"","type":"uint256"}],"stateMutability":"view","type":"function"}];
 
 export function PartySplit() {
   const { isConnected, address } = useAccount();
   const { data: balanceData, isLoading: isBalanceLoading, refetch: refetchBalance } = useBalance({ address });
   const { data: blockNumber } = useBlockNumber({ watch: true });
   const [rsvpError, setRsvpError] = useState<string | null>(null);
+  const [venueAddress, setVenueAddress] = useState('');
+  const [billAmount, setBillAmount] = useState('');
+  const [payBillError, setPayBillError] = useState<string | null>(null);
 
   const { 
     data: contractData,
@@ -79,10 +78,27 @@ export function PartySplit() {
     });
   };
 
+  const handlePayBill = async (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+    setPayBillError(null);
+    if (!venueAddress || !billAmount) {
+      setPayBillError('Please provide both venue address and bill amount.');
+      return;
+    }
+    writeContract({
+      address: contractAddress,
+      abi: contractABI,
+      functionName: 'payBill',
+      args: [venueAddress, parseEther(billAmount)],
+    });
+  };
+
   React.useEffect(() => {
     if (isConfirmed) {
       refetchContractData();
       refetchBalance();
+      setVenueAddress('');
+      setBillAmount('');
     }
   }, [isConfirmed, refetchContractData, refetchBalance]);
 
@@ -132,11 +148,34 @@ export function PartySplit() {
               {isWritePending ? 'Confirming...' : isConfirming ? 'Processing...' : 'RSVP'}
             </button>
           </form>
+          <form onSubmit={handlePayBill} className="mt-4">
+            <input
+              type="text"
+              value={venueAddress}
+              onChange={(e) => setVenueAddress(e.target.value)}
+              placeholder="Venue Address"
+              className="border p-2 mr-2"
+            />
+            <input
+              type="text"
+              value={billAmount}
+              onChange={(e) => setBillAmount(e.target.value)}
+              placeholder="Bill Amount (ETH)"
+              className="border p-2 mr-2"
+            />
+            <button 
+              type="submit"
+              disabled={isWritePending || isConfirming}
+              className="bg-yellow-500 hover:bg-yellow-700 text-white font-bold py-2 px-4 rounded disabled:bg-gray-400"
+            >
+              {isWritePending ? 'Confirming...' : isConfirming ? 'Processing...' : 'Pay Bill'}
+            </button>
+          </form>
           {hash && <div>Transaction Hash: {hash}</div>}
           {isConfirming && <div>Waiting for confirmation...</div>}
           {isConfirmed && <div>Transaction confirmed.</div>}
-          {(writeError || rsvpError) && (
-            <div>Error: {(writeError as BaseError)?.shortMessage || writeError?.message || rsvpError}</div>
+          {(writeError || rsvpError || payBillError) && (
+            <div>Error: {(writeError as BaseError)?.shortMessage || writeError?.message || rsvpError || payBillError}</div>
           )}
         </div>
       ) : (
