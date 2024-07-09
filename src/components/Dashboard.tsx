@@ -32,6 +32,10 @@ export default function Dashboard() {
                 <UserGroupIcon className="h-5 w-5" />
                 <span className="hidden md:block">Split Party</span>
               </NavLink>
+              <NavLink to="/dashboard/deathmanswitch" className={({ isActive }) => `flex h-[48px] grow items-center justify-center gap-2 rounded-md text-gray-50 p-3 text-sm font-medium md:flex-none md:justify-start md:p-2 md:px-3 ${ isActive ? 'bg-red-800' : 'bg-green-800 hover:bg-red-900'}`}>
+                <UserGroupIcon className="h-5 w-5" />
+                <span className="hidden md:block">DeathmanSwitch</span>
+              </NavLink>              
               <NavLink to="/dashboard/paywithmetamask" className={({ isActive }) => `flex h-[48px] grow items-center justify-center gap-2 rounded-md text-gray-50 p-3 text-sm font-medium md:flex-none md:justify-start md:p-2 md:px-3 ${ isActive ? 'bg-red-800' : 'bg-green-800 hover:bg-red-900'}`}>
                 <DocumentDuplicateIcon className="h-5 w-5" />
                 <span className="hidden md:block">Pay with MetaMask</span>

@@ -7,6 +7,7 @@ import NotFoundPage from "./components/NotFoundPage";
 import PartySplit from "./components/PartySplit";
 import PayWithMetamask from "./components/PayWithMetamask";
 import PayWithSigner from "./components/PayWithSigner";
+import DeathmanSwitch from "./components/DeatmanSwitch";
 import './styles/main.css';
 
 import { WagmiProvider, createConfig } from "wagmi";
@@ -30,6 +31,7 @@ const router = createHashRouter([
   { path: "/", element: <HomePage />, errorElement: <NotFoundPage />},
   { path: "/dashboard", element: <Dashboard />, children: [
       { path: "splitparty", element: <PartySplit />},
+      { path: "deathmanswitch", element: <DeathmanSwitch />},
       { path: "paywithmetamask", element: <PayWithMetamask />},
       { path: "paywithsigner", element: <PayWithSigner />},
   ]},
