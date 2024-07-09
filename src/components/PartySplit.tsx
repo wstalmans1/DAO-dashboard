@@ -154,14 +154,14 @@ export function PartySplit() {
               value={venueAddress}
               onChange={(e) => setVenueAddress(e.target.value)}
               placeholder="Venue Address"
-              className="border p-2 mr-2"
+              className="border p-2 mr-2 rounded-md text-gray-500 placeholder-gray-500"
             />
             <input
               type="text"
               value={billAmount}
               onChange={(e) => setBillAmount(e.target.value)}
               placeholder="Bill Amount (ETH)"
-              className="border p-2 mr-2"
+              className="border p-2 mr-2 rounded-md text-gray-500 placeholder-gray-500"
             />
             <button 
               type="submit"
