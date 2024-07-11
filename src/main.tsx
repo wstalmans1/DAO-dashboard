@@ -6,7 +6,7 @@ import Dashboard from "./components/Dashboard";
 import NotFoundPage from "./components/NotFoundPage";
 import PartySplit from "./components/PartySplit";
 import PayWithMetamask from "./components/PayWithMetamask";
-import PayWithSigner from "./components/PayWithSigner";
+import ERC20 from "./components/ERC20";
 import DeathmanSwitch from "./components/DeatmanSwitch";
 import './styles/main.css';
 
@@ -33,7 +33,7 @@ const router = createHashRouter([
       { path: "splitparty", element: <PartySplit />},
       { path: "deathmanswitch", element: <DeathmanSwitch />},
       { path: "paywithmetamask", element: <PayWithMetamask />},
-      { path: "paywithsigner", element: <PayWithSigner />},
+      { path: "erc20", element: <ERC20 />},
   ]},
 ]);
 
