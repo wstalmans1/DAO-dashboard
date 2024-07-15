@@ -11,14 +11,14 @@ import DeathmanSwitch from "./components/DeatmanSwitch";
 import './styles/main.css';
 
 import { WagmiProvider, createConfig } from "wagmi";
-import { sepolia, mainnet } from "wagmi/chains";
+import { sepolia, mainnet, polygon, polygonMumbai, linea, optimism } from "wagmi/chains";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { ConnectKitProvider, getDefaultConfig } from "connectkit";
 
 const config = createConfig(
   getDefaultConfig({
     // Your dApps chains
-    chains: [sepolia, mainnet],
+    chains: [sepolia, mainnet, polygon, polygonMumbai, linea, optimism],
     walletConnectProjectId: 'default_project_id',
     appName: "TBA DAO",
   }),
