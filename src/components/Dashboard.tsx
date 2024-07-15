@@ -74,7 +74,7 @@ export default function Dashboard() {
             {/* <LatestInvoices latestInvoices={latestInvoices} /> */}
           {/* </div> */}
           
-          <div className="flex items-center pt-1 pb-2">
+          <div className="flex justify-end mb-2">
             {/*<div className="pr-4"><ConnectionDot/></div>*/}
             <div className="flex items-center">
               {/*<ConnectKitButton />*/}

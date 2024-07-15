@@ -29,6 +29,21 @@ const StyledButton = styled.button`
   }
 `;
 
+const HamburgerIcon = styled.div`
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  width: 18px;
+  height: 14px;
+  margin-right: 8px;
+
+  div {
+    width: 100%;
+    height: 2px;
+    background-color: #ffffff;
+  }
+`;
+
 const ConnectionDot = () => {
 
   const { isConnected, address } = useAccount();
@@ -48,7 +63,12 @@ const ConnectionDot = () => {
               <StyledButton>
                 {isConnected ?(
                 <>
-                   {ensName ? `${ensName} (${truncatedAddress})` : truncatedAddress}
+                  <HamburgerIcon>
+                    <div></div>
+                    <div></div>
+                    <div></div>
+                  </HamburgerIcon>
+                  {ensName ? `${ensName} (${truncatedAddress})` : truncatedAddress}
                   <span className="inline-flex items-center justify-center bg-blue-700 text-center rounded-xl p-3 ml-3" style={{ height: '1.97rem' }}> {formattedBalance} {balanceData?.symbol} { "on" } {chain?.name}</span>
                 </>
               ) : (
