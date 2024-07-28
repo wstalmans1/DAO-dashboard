@@ -7,7 +7,7 @@ import NotFoundPage from "./components/NotFoundPage";
 import PartySplit from "./components/PartySplit";
 import PayWithMetamask from "./components/PayWithMetamask";
 import ERC20 from "./components/ERC20";
-import DeathmanSwitch from "./components/DeatmanSwitch";
+import DeathmanSwitch from "./components/DeathmanSwitch";
 import './styles/main.css';
 
 import { WagmiProvider, createConfig } from "wagmi";
