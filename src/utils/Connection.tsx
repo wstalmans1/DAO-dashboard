@@ -2,6 +2,8 @@ import { useAccount, useBalance } from 'wagmi';
 import { ConnectKitButton } from "connectkit";
 import styled from "styled-components";
 import { formatUnits } from 'viem';
+import { useGateway } from "@civic/ethereum-gateway-react";
+
 
 const StyledButton = styled.button`
   cursor: pointer;
@@ -48,7 +50,7 @@ const ConnectionDot = () => {
 
   const { isConnected, address } = useAccount();
   const { data: balanceData } = useBalance({ address});
-
+  const { requestGatewayToken } = useGateway();
 
 
   const formattedBalance = balanceData ? Number(formatUnits(balanceData.value, balanceData.decimals)).toFixed(2) : '0.00';
@@ -60,7 +62,7 @@ const ConnectionDot = () => {
             <div onClick={show} className="cursor-pointer flex items-center">
               <div className={`h-3 w-3 rounded-full ${isConnected ? 'bg-green-500' : 'bg-red-500'}`}></div>
               <span className="ml-2 mr-3 text-l">{isConnected ? `Connected` : 'Not Connected'}</span>
-              <StyledButton>
+              <StyledButton onClick={requestGatewayToken}>
                 {isConnected ?(
                 <>
                   <HamburgerIcon>
