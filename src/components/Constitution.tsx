@@ -76,6 +76,8 @@ const Constitution: React.FC = () => {
           <b>2. Legacy and Continuity:</b><br/>
           The DAO shall strive to leave a positive legacy, ensuring that any knowledge, technologies, or innovations developed are preserved and made available to future communities or organizations that align with its guiding principles.
         </p>
+        <br/>
+        <br/>
         <p className="text-l mb-4 text-justify">
           This constitution aims to create a decentralized autonomous organization that not only functions effectively but also embodies the principles that make natural systems resilient and sustainable. By incorporating these elements, the DAO can evolve in a way that aligns with both the complexities of its environment and the needs of its members.
         </p>
